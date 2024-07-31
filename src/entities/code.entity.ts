@@ -10,4 +10,6 @@ export default class Codes {
     code: number;
     @Column({ nullable: true, default: false })
     is_used: boolean;
+    @Column({ default: Date.now() })
+    date: string;
 }

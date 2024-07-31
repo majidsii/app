@@ -48,12 +48,24 @@ export class AuthService {
             });
 
             if (checkCode) {
-                await this.code_repository.update(checkCode, { is_used: true });
-                const accessTokn = await this.JwtService.sign({
-                    sub: user.id,
-                    email: user.email,
-                });
-                return { access_Tokn: accessTokn };
+                const time2 = Number(checkCode.date);
+                const time1 = Date.now();
+                const FIVE_MINUTES_IN_MS = 5 * 60 * 1000;
+                const difference = Math.abs(time1 - time2);
+                const five = difference < FIVE_MINUTES_IN_MS;
+                console.log(five);
+                if (five) {
+                    await this.code_repository.update(checkCode, {
+                        is_used: true,
+                    });
+                    const accessTokn = await this.JwtService.sign({
+                        sub: user.id,
+                        email: user.email,
+                    });
+                    return { access_Tokn: accessTokn };
+                } else {
+                    throw new HttpException('code is expire', 404);
+                }
             } else {
                 throw new HttpException('code is not valid', 400);
             }
